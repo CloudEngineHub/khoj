@@ -1115,23 +1115,23 @@ class ConversationAdapters:
 
     @staticmethod
     def get_chat_model(user: KhojUser):
-        subscribed = is_user_subscribed(user)
-        if not subscribed:
-            return ConversationAdapters.get_default_chat_model(user)
         config = UserConversationConfig.objects.filter(user=user).first()
         if config:
             return config.setting
+        subscribed = is_user_subscribed(user)
+        if not subscribed:
+            return ConversationAdapters.get_default_chat_model(user)
         return ConversationAdapters.get_advanced_chat_model(user)
 
     @staticmethod
     async def aget_chat_model(user: KhojUser):
-        subscribed = await ais_user_subscribed(user)
-        if not subscribed:
-            return await ConversationAdapters.aget_default_chat_model(user)
         config = await UserConversationConfig.objects.filter(user=user).prefetch_related("setting").afirst()
         if config:
             return config.setting
-        return ConversationAdapters.aget_advanced_chat_model(user)
+        subscribed = await ais_user_subscribed(user)
+        if not subscribed:
+            return await ConversationAdapters.aget_default_chat_model(user)
+        return await ConversationAdapters.aget_advanced_chat_model(user)
 
     @staticmethod
     def get_chat_model_by_name(chat_model_name: str, ai_model_api_name: str = None):
